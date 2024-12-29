@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Chart</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <h1>Sales vs. Expenses Chart</h1>
+  <canvas id="myChart" width="400" height="200"></canvas>
+
+  <script>
+    // Mock JSON data as if fetched from Google Sheets
+    const jsonData = {
+      feed: {
+        entry: [
+          { content: { $t: "Month" } },
+          { content: { $t: "Sales" } },
+          { content: { $t: "Expenses" } },
+          { content: { $t: "January" } },
+          { content: { $t: "1200" } },
+          { content: { $t: "800" } },
+          { content: { $t: "February" } },
+          { content: { $t: "1500" } },
+          { content: { $t: "900" } },
+          { content: { $t: "March" } },
+          { content: { $t: "1700" } },
+          { content: { $t: "950" } },
+          { content: { $t: "April" } },
+          { content: { $t: "2000" } },
+          { content: { $t: "1100" } },
+          { content: { $t: "May" } },
+          { content: { $t: "2300" } },
+          { content: { $t: "1200" } }
+        ]
+      }
+    };
+
+    // Process the JSON data
+    function processSheetData(data) {
+      const entries = data.feed.entry;
+      const labels = [];
+      const salesData = [];
+      const expensesData = [];
+
+      for (let i = 3; i < entries.length; i += 3) {
+        labels.push(entries[i].content.$t); // Month
+        salesData.push(parseInt(entries[i + 1].content.$t)); // Sales
+        expensesData.push(parseInt(entries[i + 2].content.$t)); // Expenses
+      }
+
+      return { labels, salesData, expensesData };
+    }
+
+    // Generate the chart
+    function generateChart({ labels, salesData, expensesData }) {
+      const ctx = document.getElementById("myChart").getContext("2d");
+      new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: "Sales",
+              data: salesData,
+              backgroundColor: "rgba(75, 192, 192, 0.6)",
+              borderColor: "rgba(75, 192, 192, 1)",
+              borderWidth: 1,
+            },
+            {
+              label: "Expenses",
+              data: expensesData,
+              backgroundColor: "rgba(255, 99, 132, 0.6)",
+              borderColor: "rgba(255, 99, 132, 1)",
+              borderWidth: 1,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'top',
+            },
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+            },
+          },
+        },
+      });
+    }
+
+    // Fetch and render the data
+    const processedData = processSheetData(jsonData);
+    generateChart(processedData);
+  </script>
+</body>
+</html>
